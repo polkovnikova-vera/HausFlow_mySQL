@@ -1,0 +1,6 @@
+{
+    "trained_at": "2026-08-14 13:20:27",
+    "positive_examples": 14,
+    "negative_examples": 22,
+    "model": "TF-IDF Kontext + Strukturmerkmale + LogisticRegression"
+}

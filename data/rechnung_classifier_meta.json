@@ -1,0 +1,19 @@
+{
+    "trained_at": "2026-08-14 13:20:26",
+    "examples": 160,
+    "classes": [
+        "Aufzug",
+        "Beleuchtung",
+        "Gartenpflege",
+        "Gebäudereinigung & Straßenreinigung",
+        "Gemeinschaftsantenne/Breitbandkabel",
+        "Grundsteuer",
+        "Hausmeister",
+        "Heizung & Warmwasser",
+        "Instandhaltung / Reparatur",
+        "Sonstiges",
+        "Versicherungen",
+        "Wasser & Abwasser"
+    ],
+    "model": "TF-IDF Volltext + Beschreibung + Umgebung + Strukturkontext + LogisticRegression"
+}
