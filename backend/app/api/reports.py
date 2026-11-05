@@ -354,3 +354,53 @@ def resolve_report(
     db.refresh(meldung)
 
     return meldung
+
+
+# ============================================================
+# GET /reports/{id}/invoices
+# Rechnungen einer Meldung anzeigen
+# ============================================================
+
+@router.get(
+    "/{report_id}/invoices",
+    response_model=list[RechnungResponse]
+)
+def get_report_invoices(
+    report_id: Annotated[int, Path(ge=1)],
+    db: DbSession,
+    user: CurrentUser
+):
+    # 1. Berechtigung prüfen
+    if user.role not in ("staff", "admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Keine Berechtigung"
+        )
+
+    # 2. Meldung suchen
+    meldung = db.get(Meldung, report_id)
+
+    if meldung is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Meldung nicht gefunden"
+        )
+
+    # 3. Gebäudezugriff prüfen
+    check_building_access(db, user, meldung.gebaeude_id)
+
+    # 4. Verknüpfte Rechnungen suchen
+    query = (
+        select(Rechnung)
+        .join(
+            MeldungRechnung,
+            Rechnung.id == MeldungRechnung.rechnung_id
+        )
+        .where(
+            MeldungRechnung.meldung_id == report_id,
+            Rechnung.gebaeude_id == meldung.gebaeude_id
+        )
+        .order_by(Rechnung.id.desc())
+    )
+
+    return db.scalars(query).all()

@@ -4,3 +4,37 @@ __pycache__/
 *.pdf
 *.db
 assets/
+
+
+# Environment
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.log
+
+# Existing project exclusions
+*.pdf
+assets/

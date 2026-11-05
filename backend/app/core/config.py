@@ -9,7 +9,7 @@ DEFAULT_CORS_ORIGINS = ("http://localhost:5173",)
 
 
 def _local_origins_from_environment() -> tuple[str, ...]:
-    configured = os.getenv("VERWIQ_CORS_ORIGINS")
+    configured = os.getenv("HAUSFLOW_CORS_ORIGINS")
     if not configured:
         return DEFAULT_CORS_ORIGINS
 
@@ -30,7 +30,7 @@ def _local_origins_from_environment() -> tuple[str, ...]:
             or parsed.fragment
         ):
             raise ValueError(
-                "VERWIQ_CORS_ORIGINS accepts only explicit local HTTP origins "
+                "HAUSFLOW_CORS_ORIGINS accepts only explicit local HTTP origins "
                 "(localhost or 127.0.0.1)."
             )
         if origin not in origins:

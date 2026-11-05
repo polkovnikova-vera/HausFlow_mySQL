@@ -5,8 +5,13 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
-from app.passwords import verify_password
-from app.schemas import LoginRequest, TokenResponse
+from app.passwords import verify_password, hash_password
+from app.schemas import (
+    LoginRequest,
+    TokenResponse,
+    RegisterRequest,
+    RegisterResponse,
+)
 from app.tokens import create_token
 
 from database.models import User, AccessToken
@@ -18,13 +23,60 @@ from app.security import (
 
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.tokens import hash_token
-
+from sqlalchemy.exc import IntegrityError
 
 
 
 router = APIRouter(prefix="/auth", tags=["Authentifizierung"])
 
 DbSession = Annotated[Session, Depends(get_db)]
+
+# ============================================================
+# POST /auth/register - Benutzer registrieren
+# ============================================================
+
+@router.post(
+    "/register",
+    response_model=RegisterResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def register(data: RegisterRequest, db: DbSession):
+
+    # 1. Pruefen, ob Benutzer bereits existiert
+    existing = db.scalar(
+        select(User).where(
+            User.username == data.username
+        )
+    )
+
+    if existing is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Benutzername bereits vergeben"
+        )
+
+    # 2. Passwort sicher hashen
+    user = User(
+        username=data.username,
+        password_hash=hash_password(data.password),
+        role="tenant"
+    )
+
+    # 3. Benutzer speichern
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Benutzername bereits vergeben"
+        )
+
+    return user
 
 
 @router.post("/login", response_model=TokenResponse)

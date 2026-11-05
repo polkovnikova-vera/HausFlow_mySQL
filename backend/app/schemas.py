@@ -1,10 +1,36 @@
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
 
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+
+NonEmptyText = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1
+    )
+]
 
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=50)
     password: str = Field(min_length=1)
 
+class RegisterRequest(BaseModel):
+    username: str = Field(
+        min_length=3,
+        max_length=50,
+        pattern=r"^[a-zA-Z0-9_]+$"
+    )
+
+    password: str = Field(
+        min_length=8,
+        max_length=128
+    )
+
+
+class RegisterResponse(BaseModel):
+    id: int
+    username: str
+    role: str
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -14,9 +40,15 @@ class TokenResponse(BaseModel):
 
 class MeldungCreate(BaseModel):
     gebaeude_id: int = Field(gt=0)
-    titel: str = Field(min_length=1, max_length=100)
-    beschreibung: str = Field(min_length=1)
-    kategorie: str | None = Field(default=None, max_length=100)
+
+    titel: NonEmptyText = Field(max_length=100)
+
+    beschreibung: NonEmptyText
+
+    kategorie: str | None = Field(
+        default=None,
+        max_length=100
+    )
 
 
 class MeldungResponse(BaseModel):
@@ -74,8 +106,8 @@ class RechnungCreate(BaseModel):
         decimal_places=2
     )
 
-    meldung_ids: list[int] = Field(
-        default_factory=list
+    meldung_ids: list[Annotated[int, Field(gt=0)]] = Field(
+    default_factory=list
     )
 
 
