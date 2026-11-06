@@ -1,1 +1,1 @@
-"""verwIQ web backend package."""
+"""HausFlow web backend package."""

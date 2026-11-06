@@ -13,4 +13,4 @@ class HealthResponse(BaseModel):
 
 @router.get("/health", response_model=HealthResponse, tags=["health"])
 def health_check() -> HealthResponse:
-    return HealthResponse(status="ok", application="verwIQ", version="0.1.0")
+    return HealthResponse(status="ok", application="HausFlow", version="0.1.0")
